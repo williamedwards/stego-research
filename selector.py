@@ -16,7 +16,10 @@ p = "../images/li_photograph/image.cd/"
 k = filter(lambda a: a != "Thumbs.db", (os.listdir(p + "1/") + os.listdir(p + "2/") + os.listdir(p + "3/") + os.listdir(p + "4/") + os.listdir(p + "5/")))
 
 def select(n):
-    l = [i.rstrip(".jpg") for i in random.sample(k,n)]
+    if n > 0:
+        l = [i.rstrip(".jpg") for i in random.sample(k,n)]
+    else:
+        l = [i.rstrip(".jpg") for i in k]
     return l
 
 def main():
