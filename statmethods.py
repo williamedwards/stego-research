@@ -60,11 +60,14 @@ def predicterror2(img):
                 eim[i,j] = 0
     return [s(eim,axis=None) for s in (np.mean,np.var,st.skew,st.kurtosis)]
 
-def haar(img):
+def haar(img, level=1):
     #Calculates a discrete wavelet transform based on the Haar wavelet
     #Calculates mean, variance, skewness, kurtosis based on each of four wavelet subbands
-    cA, (cH, cV, cD) = pywt.dwt2(img, "haar")
-    return [s(c, axis=None) for c in cA, cH, cV, cD for s in np.mean, np.var, st.skew, st.kurtosis]
+    dwt = pywt.wavedec2(img, "haar", level=level)
+    cs = [dwt[0]]
+    for c in dwt[1:]:
+        cs += c
+    return [s(c, axis=None) for c in cs for s in np.mean, np.var, st.skew, st.kurtosis]
 
 if __name__ == "__main__":
     print haar(ndimg.imread("../images/li_photograph/image.cd/1/10000.jpg")[:,:,0])

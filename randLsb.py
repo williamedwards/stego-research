@@ -13,6 +13,8 @@ import scipy.ndimage as ndimg
 import numpy as np
 
 def randLsb(oimg,rate):
+    if rate == 0:
+        return oimg
     img = np.empty_like(oimg)
     img[:] = oimg
     for i in xrange(0,len(img.flat)):
@@ -20,12 +22,12 @@ def randLsb(oimg,rate):
             img.flat[i] ^= 0 if random.random() < 0.5 else 1
     return img
 
-def rand(imname,r):
-    return randLsb(ndimg.imread("../images/li_photograph/image.cd/" + imname[0] + "/" + imname + ".jpg"),r)
+def rand(imname,r,flatten=False):
+    return randLsb(np.uint8(ndimg.imread("../images/li_photograph/image.cd/" + imname[0] + "/" + imname + ".jpg", flatten=flatten)),r)
 
 def main():
     img = ndimg.imread("../images/li_photograph/image.cd/1/10000.jpg")
-    print (img == randLsb(img,0.1))
+    print (img == randLsb(img,1))
 
 if __name__ == '__main__':
     main()

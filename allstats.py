@@ -14,7 +14,7 @@ def main():
     stime=time.time()
     i=0
     for im in selector.select(-1):
-        imstat.writeStats(im, "imstats/final01/")
+        imstat.writeStats(im, "imstats/final02/")
         print(str(i) + "\t" + str(time.time()-stime))
         i += 1
 
