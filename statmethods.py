@@ -35,7 +35,7 @@ def predicterror1(img, threshold=4):
         stats += [s(eim,axis=None) for s in (np.mean,np.var,st.skew,st.kurtosis)]
     return stats
 
-def predicterror2(img):
+def predicterror2(img, raw_image=False):
     #Produces a single prediction error image based on Shi article
     #Returns Mean, Variance, Skewness, and Kurtosis for each
     eim = np.empty_like(img)
@@ -58,7 +58,10 @@ def predicterror2(img):
         else:
             for j, p in enumerate(row):
                 eim[i,j] = 0
-    return [s(eim,axis=None) for s in (np.mean,np.var,st.skew,st.kurtosis)]
+    if not raw_image:
+        return [s(eim,axis=None) for s in (np.mean,np.var,st.skew,st.kurtosis)]
+    else:
+        return eim
 
 def haar(img, level=1):
     #Calculates a discrete wavelet transform based on the Haar wavelet

@@ -15,28 +15,34 @@ import scipy.ndimage as ndimg
 import time, itertools, os
 import randLsb
 
+def checkpath(p):
+    if not os.path.exists(os.path.dirname(p)):
+        os.makedirs(os.path.dirname(p))
+
 def getStats(img, methods):
 ##    imgr = img[:,:,0]
 ##    imgg = img[:,:,1]
 ##    imgb = img[:,:,2]
-    eims = []
-    for method in methods:
-        eims.append(method(img))
     stats = []
-    for eim in eims:
-        stats += [s(eim, axis=None) for s in (np.mean, np.var,st.skew,st.kurtosis)]
+    for method in methods:
+        stats += method(img)
     return stats
 
 def writeStats(imname, savepath, img=None, overwrite=False, methods=[stm.predicterror2]):
     if not os.path.exists("../images/" + savepath + imname + ".npy") or overwrite:
         if img == None:
-            img = np.uint8(ndimg.imread("../images/li_photograph/image.cd/" + imname[0] + "/" + imname + ".jpg", flatten=True))
+            p = "../images/li_photograph/image.cd/" + imname[0] + "/" + imname + ".jpg"
+            checkpath(p)
+            img = np.uint8(ndimg.imread(p, flatten=True))
         stats = getStats(img, methods)
-        np.save("../images/" + savepath + imname, stats)
+        p = "../images/" + savepath + imname
+        checkpath(p)
+        np.save(p, stats)
         return stats
 
 def loadStats(imlist, loadpath="../images/imstats/final02/"):
-    stats = np.empty((len(imlist), 8))
+    n = len(np.load(loadpath + imlist[0] + ".npy"))
+    stats = np.empty((len(imlist), n))
     for i, im in enumerate(imlist):
         stats[i] = np.load(loadpath + im + ".npy")
     return stats
