@@ -59,7 +59,7 @@ class ANN:
         b.train()
         
     def predict(self, inp):
-        return [bool(round(self.net.activate(i))) for i in inp]
+        return [0 if self.net.activate(i)<0.5 else 1 for i in inp]
 
         
     

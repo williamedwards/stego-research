@@ -23,7 +23,7 @@ def main():
     clearstats = imstat.loadStats(clearlist, loadpath="../images/imstats/svmopt/" + str(RUN) + "/" + kernel + "/clear/")
     file.close()
 
-    for i, rate in enumerate([0.2,0.3]):
+    for i, rate in enumerate([.01,.05,.10,.20,0.30,0.50,.80,1.00]):
         file = open("../data/svmopt/" + str(RUN) +'/lists/' + kernel + '/' + str(int(rate*100)) + ".txt", "r")
         stegolist = file.read().split(",")
         file.close()
