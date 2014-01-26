@@ -53,6 +53,9 @@ class ANN:
                 
         #Begin training process
         b = BackpropTrainer(self.net, self.data, learningrate=self.lrate)
+        self.train(b)
+        
+    def train(self, b):
         b.train()
         
     def predict(self, inp):
