@@ -73,4 +73,4 @@ def haar(img, level=1):
     return [s(c, axis=None) for c in cs for s in np.mean, np.var, st.skew, st.kurtosis]
 
 if __name__ == "__main__":
-    print haar(ndimg.imread("../images/li_photograph/image.cd/1/10000.jpg")[:,:,0])
+    print haar(ndimg.imread("../images/li_photograph/image.cd/1/10000.jpg")[:,:,0], level=3)

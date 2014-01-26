@@ -10,10 +10,11 @@
 #-------------------------------------------------------------------------------
 import numpy as np, selector, imstat, randLsb, time
 from sklearn import preprocessing, grid_search, svm
+from sklearn.metrics import jaccard_similarity_score
 from matplotlib import pyplot as plt
 
 RUN = 4
-kernel = "linear"
+kernel = "rbf"
 
 def main():
     stime = time.time()
@@ -22,7 +23,7 @@ def main():
     clearstats = imstat.loadStats(clearlist, loadpath="../images/imstats/svmopt/" + str(RUN) + "/" + kernel + "/clear/")
     file.close()
 
-    for i, rate in enumerate([0.01, 0.05, 0.1, 0.5, 0.8, 1.0]):
+    for i, rate in enumerate([0.2,0.3]):
         file = open("../data/svmopt/" + str(RUN) +'/lists/' + kernel + '/' + str(int(rate*100)) + ".txt", "r")
         stegolist = file.read().split(",")
         file.close()
@@ -33,8 +34,8 @@ def main():
 ##        plt.show()
         optset = preprocessing.scale(optset)
         svr = svm.SVC(kernel=kernel)
-        param_grid = {"C":[10**k for k in xrange(-6,5)]} #, "gamma":[10**k for k in xrange(-6,5)]}
-        clf = grid_search.GridSearchCV(svr, param_grid, cv=5)
+        param_grid = {"C":[10**k for k in xrange(-6,5)] , "gamma":[10**k for k in xrange(-6,5)]}
+        clf = grid_search.GridSearchCV(svr, param_grid, cv=5, scoring="accuracy")
         clf.fit(optset, np.asarray([0 for j in clearlist] + [1 for j in stegolist]))
         print clf.best_params_
         print clf.best_score_
