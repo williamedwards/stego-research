@@ -9,8 +9,8 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import selector, imstat, os, statmethods as stm, randLsb
-RUN = 2
-TrainSize = 100
+RUN = 5
+TrainSize = 300
 EvalSize = 100
 methods = [stm.same, stm.predicterror2, lambda x: stm.haar(x, level=3), lambda x: stm.haar(stm.predicterror2(x, raw_image=True), level=3)]
 

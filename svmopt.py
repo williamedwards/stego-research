@@ -29,17 +29,17 @@ def main():
         file.close()
         stegostats = imstat.loadStats(stegolist, loadpath="../images/imstats/svmopt/" + str(RUN) + "/" + kernel + "/" + str(int(rate*100)) + "/")
         optset = np.concatenate((clearstats, stegostats))
-##        plt.plot(clearstats[:,1],clearstats[:,15], "bo")
-##        plt.plot(stegostats[:,1],stegostats[:,15], "r+")
-##        plt.show()
-        optset = preprocessing.scale(optset)
-        svr = svm.SVC(kernel=kernel)
-        param_grid = {"C":[10**k for k in xrange(-6,5)] , "gamma":[10**k for k in xrange(-6,5)]}
-        clf = grid_search.GridSearchCV(svr, param_grid, cv=5, scoring="accuracy")
-        clf.fit(optset, np.asarray([0 for j in clearlist] + [1 for j in stegolist]))
-        print clf.best_params_
-        print clf.best_score_
-    print time.time() - stime
+        plt.plot(clearstats[:,1],clearstats[:,15], "bo")
+        plt.plot(stegostats[:,1],stegostats[:,15], "r+")
+        plt.show()
+##        optset = preprocessing.scale(optset)
+##        svr = svm.SVC(kernel=kernel)
+##        param_grid = {"C":[10**k for k in xrange(-6,5)] , "gamma":[10**k for k in xrange(-6,5)]}
+##        clf = grid_search.GridSearchCV(svr, param_grid, cv=5, scoring="accuracy")
+##        clf.fit(optset, np.asarray([0 for j in clearlist] + [1 for j in stegolist]))
+##        print clf.best_params_
+##        print clf.best_score_
+##    print time.time() - stime
 
 if __name__ == '__main__':
     main()

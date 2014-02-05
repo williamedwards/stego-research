@@ -9,17 +9,22 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from sklearn import preprocessing, svm
-import imstat, numpy as np, cPickle, nnwrapper, os, copy
-RUN = 2
+import imstat, numpy as np, cPickle, nnwrapper, os, copy, random
+from sklearn import grid_search
+RUN = 5
 # Set Parameters:
-params = {}
-params["linear"] = {.01:{"C":1},.05:{"C":100},.1:{"C":0.01},.2:{"C":10},.3:{"C":0.1},.5:{"C":0.1}}
-
-params["rbf"] = {.01:{"C":1,"gamma":.1, "kernel":"rbf"},.05:{"C":1000,"gamma":.0001, "kernel":"rbf"},.1:{"C":10,"gamma":.001, "kernel":"rbf"},
-.2:{"C":10,"gamma":.001, "kernel":"rbf"},.3:{"C":10,"gamma":.01, "kernel":"rbf"}, .5:{"C":10,"gamma":.001, "kernel":"rbf"}} 
-    
-params["ann"] = {.01:{"hlayers":3,"hnodes":60, "lrate":0.1},.05:{"hlayers":2,"hnodes":10, "lrate":10},.1:{"hlayers":3,"hnodes":30, "lrate":1},.2:{"hlayers":3,"hnodes":30, "lrate":1},
-.3:{"hlayers":3,"hnodes":10, "lrate":100},.5:{"hlayers":3,"hnodes":40, "lrate":0.1}}
+##params = {}
+##params["linear"] = {.01:{"C":1},.05:{"C":100},.1:{"C":0.01},.2:{"C":10},.3:{"C":0.1},.5:{"C":0.1}}
+##
+##params["rbf"] = {.01:{"C":1,"gamma":.1, "kernel":"rbf"},.05:{"C":1000,"gamma":.0001, "kernel":"rbf"},.1:{"C":10,"gamma":.001, "kernel":"rbf"},
+##.2:{"C":10,"gamma":.001, "kernel":"rbf"},.3:{"C":10,"gamma":.01, "kernel":"rbf"}, .5:{"C":10,"gamma":.001, "kernel":"rbf"}} 
+##    
+##params["ann"] = {.01:{"hlayers":3,"hnodes":60, "lrate":0.1},.05:{"hlayers":2,"hnodes":10, "lrate":10},.1:{"hlayers":3,"hnodes":30, "lrate":1},.2:{"hlayers":3,"hnodes":30, "lrate":1},
+##.3:{"hlayers":3,"hnodes":10, "lrate":100},.5:{"hlayers":3,"hnodes":40, "lrate":0.1}}
+param_grid = {}
+param_grid["linear"] = {"C":[10**k for k in xrange(-6,5)]}
+param_grid["rbf"] = {"C":[10**k for k in xrange(-6,5)] , "gamma":[10**k for k in xrange(-6,5)]}
+param_grid["ann"] = {"hlayers":[1,2,3],"hnodes":[i for i in xrange(10,160,10)],"lrate":[10**k for k in xrange(-3,3)]}
 
 def checkpath(p):
     if not os.path.exists(os.path.dirname(p)):
@@ -38,25 +43,35 @@ def main():
         dataset = np.concatenate((clearstats,stegostats))
         preprocessing.scale(dataset)
         target = np.asarray([0 for j in clearlist] + [1 for j in stegolist])
+        merge = zip(dataset, target)
+        random.shuffle(merge)
+        dataset,target = zip(*merge)
+        dataset = np.asarray(dataset)
+        target = np.asarray(target)
         #First the Support Vector Machines
         for kernel in ("rbf","linear"):
             if kernel == "linear":
-                svc = svm.LinearSVC(**params[kernel][rate])
+                svc = svm.LinearSVC()
             else:
-                svc = svm.SVC(**params[kernel][rate])
-            svc.fit(dataset,target)
+                svc = svm.SVC(kernel="rbf")
+            clf = grid_search.GridSearchCV(svc, param_grid[kernel], cv=5, scoring="accuracy")
+            clf.fit(dataset, target)
+            print clf.best_score_
             path = "../pickles/final/" + str(RUN) + "/" + str(kernel) + str(int(rate*100))
             checkpath(path)
             file = open(path, "w")
-            cPickle.dump(svc,file)
+            cPickle.dump(clf.best_estimator_,file)
             file.close()
             
         #Now the neural network
-        ann = nnwrapper.ANN(**params["ann"][rate])
-        ann.train = lambda b: b.trainUntilConvergence(maxEpochs=50)
-        ann.fit(dataset, target)
-        ann2 = nnwrapper.ANN(**params["ann"][rate])
-        ann2.net = copy.deepcopy(ann.net)
+        ann = nnwrapper.ANN()
+        ann.train = lambda b: b.train()
+        clf = grid_search.GridSearchCV(ann, param_grid["ann"], cv=5, scoring="accuracy")
+        clf.fit(dataset, target)
+        print clf.best_score_
+        ann2 = nnwrapper.ANN()
+        ann2.set_params(**clf.best_estimator_.get_params())
+        ann2.net = copy.deepcopy(clf.best_estimator_.net)
         path = "../pickles/final/" + str(RUN) + "/ann" + str(int(rate*100))
         checkpath(path)
         file=open(path, "w")

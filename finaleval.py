@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import imstat, cPickle
-RUN = 2
+RUN = 5
 
 def main():
     correctc = {}
