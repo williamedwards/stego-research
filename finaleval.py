@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import imstat, cPickle
-RUN = 5
+RUN = 8
 
 def main():
     correctc = {}
@@ -24,8 +24,14 @@ def main():
     for rate in [0.01,0.05,0.1,0.2,0.3,0.5]:
         file = open("../data/final/" + str(RUN) + "/lists/e" + str(int(rate*100)) + ".txt")
         stegolist = file.read().split(",")
-        file.close()
         stegostats = imstat.loadStats(stegolist, loadpath="../images/imstats/final/" + str(RUN) + "/e" + str(int(rate*100)) + "/")
+        file.close()
+        path = "../pickles/final/" + str(RUN) + "/scl" + str(int(rate*100))
+        file = open(path, "r")
+        scl = cPickle.load(file)
+        file.close()
+        clearstats = scl.transform(clearstats)
+        stegostats = scl.transform(stegostats)        
         correctc[rate], cresults = test(clearstats,0, str(int(rate*100)))
         corrects[rate], sresults = test(stegostats,1, str(int(rate*100)))
         for name in cresults:

@@ -11,7 +11,7 @@
 from sklearn import preprocessing, svm
 import imstat, numpy as np, cPickle, nnwrapper, os, copy, random
 from sklearn import grid_search
-RUN = 5
+RUN = 8
 # Set Parameters:
 ##params = {}
 ##params["linear"] = {.01:{"C":1},.05:{"C":100},.1:{"C":0.01},.2:{"C":10},.3:{"C":0.1},.5:{"C":0.1}}
@@ -41,7 +41,14 @@ def main():
         file.close()
         stegostats = imstat.loadStats(stegolist, loadpath="../images/imstats/final/" + str(RUN) + "/t" + str(int(rate*100)) + "/")
         dataset = np.concatenate((clearstats,stegostats))
-        preprocessing.scale(dataset)
+        scl = preprocessing.StandardScaler()
+        dataset = scl.fit_transform(dataset)
+        path = "../pickles/final/" + str(RUN) + "/scl" + str(int(rate*100))
+        checkpath(path)
+        file = open(path, "w")
+        cPickle.dump(scl,file)
+        file.close()
+        dataset = scl.fit_transform(dataset)
         target = np.asarray([0 for j in clearlist] + [1 for j in stegolist])
         merge = zip(dataset, target)
         random.shuffle(merge)
